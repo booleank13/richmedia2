@@ -22,7 +22,7 @@ let gameState = 'start'; // start, playing, win, gameover
 let lastTime = 0;
 
 // Entities
-let player;
+var player;
 let obstacles = [];
 const goalImage = new Image();
 goalImage.src = 'assets/goals.png';
@@ -106,7 +106,7 @@ function setupInput() {
         if (gameState !== 'playing') return;
         const touchEndX = e.changedTouches[0].clientX;
         const touchEndY = e.changedTouches[0].clientY;
-        handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
+        handleInput(touchStartX, touchStartY, touchEndX, touchEndY);
         e.preventDefault();
     }, {passive: false});
 
@@ -123,7 +123,23 @@ function setupInput() {
         if (gameState !== 'playing') return;
         const touchEndX = e.clientX;
         const touchEndY = e.clientY;
-        handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
+        handleInput(touchStartX, touchStartY, touchEndX, touchEndY);
+    });
+
+    // Keyboard for easy testing
+    window.addEventListener('keydown', e => {
+        if (gameState === 'start') {
+            startGame();
+            return;
+        }
+        if (gameState !== 'playing') return;
+
+        switch(e.key) {
+            case 'ArrowLeft': movePlayer(-1, 0); break;
+            case 'ArrowRight': movePlayer(1, 0); break;
+            case 'ArrowUp': movePlayer(0, -1); break;
+            case 'ArrowDown': movePlayer(0, 1); break;
+        }
     });
 
     retryBtn.addEventListener('click', () => {
@@ -137,16 +153,38 @@ function startGame() {
     lastTime = performance.now();
 }
 
-function handleSwipe(x1, y1, x2, y2) {
+function handleInput(x1, y1, x2, y2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
 
-    // Tap or Swipe Up
+    // If movement is very small, treat as TAP
     if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
-        movePlayer(0, -1); // Tap moves forward
+        // Tap Zones
+        // x1 is the click position
+        // Determine relative to canvas width
+
+        // We need to account for canvas scaling if any, but since we use exact px in CSS:
+        // x1 is clientX.
+        // We should really get bounding client rect if canvas isn't full screen or centered awkwardly.
+        // But for this simplified environment (canvas is centered), let's use the touch coords directly
+        // assuming they match reasonably well or just use window width.
+        // Actually, let's look at where the canvas is.
+        const rect = canvas.getBoundingClientRect();
+        const tapX = x1 - rect.left;
+
+        const third = rect.width / 3;
+
+        if (tapX < third) {
+            movePlayer(-1, 0); // Left
+        } else if (tapX > 2 * third) {
+            movePlayer(1, 0); // Right
+        } else {
+            movePlayer(0, -1); // Center -> Forward
+        }
         return;
     }
 
+    // Swipe Logic (Keep this for users who actually swipe)
     if (Math.abs(dx) > Math.abs(dy)) {
         // Horizontal
         if (Math.abs(dx) > 20) {
