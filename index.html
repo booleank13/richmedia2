@@ -136,6 +136,44 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
+
+        /* Promo Box Animation */
+        #promo-box {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #F27A1A, #d85f00);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            pointer-events: auto;
+            animation: pulse-promo 2s infinite ease-in-out;
+            border: 2px solid white;
+        }
+        #promo-box::after {
+            content: "SÜPER\A FIRSAT";
+            white-space: pre;
+            color: white;
+            font-weight: 900;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.3;
+            animation: content-cycle 3s infinite step-end;
+        }
+        @keyframes pulse-promo {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        @keyframes content-cycle {
+            0% { content: "SÜPER\A FIRSAT"; }
+            50% { content: "İNDİRİM\A YAKALA"; }
+        }
     </style>
 </head>
 <body>
@@ -146,6 +184,7 @@
     <div id="ui-layer">
         <div id="header">Kategori Seçmek İçin İlerle!</div>
         <div class="tap-hint" id="tap-hint">Başlamak için Dokun</div>
+        <div id="promo-box"></div>
     </div>
 
     <div id="end-card">
