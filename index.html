@@ -8,24 +8,27 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #333;
-            overflow: hidden; /* Prevent scrolling */
-            font-family: sans-serif;
-            touch-action: none; /* Prevent browser handling of touch gestures */
-        }
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            touch-action: none;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+        }
+        #game-container {
+            position: relative;
+            width: 320px;
+            height: 480px;
+            background-color: #333;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
         canvas {
-            background-color: #e0e0e0;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
+            display: block;
         }
         #ui-layer {
             position: absolute;
@@ -38,12 +41,19 @@
             flex-direction: column;
             justify-content: space-between;
         }
-        #score-board {
-            padding: 20px;
-            color: white;
-            font-size: 24px;
+        #header {
+            position: absolute;
+            top: 100px; /* Below the goal image */
+            width: 100%;
+            text-align: center;
+            color: #333; /* Darker text for better contrast on white/gray bg */
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0px 0px 2px white;
+            font-size: 14px;
+            opacity: 1;
+            z-index: 5;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px 0;
         }
         #end-card {
             position: absolute;
@@ -51,70 +61,98 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: none; /* Hidden by default */
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
             pointer-events: auto;
             z-index: 10;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
         #end-card h1 {
-            margin-bottom: 20px;
-            color: #F27A1A; /* Trendyol Orange */
-            font-size: 32px;
-            text-align: center;
+            margin-bottom: 10px;
+            color: #F27A1A;
+            font-size: 28px;
+        }
+        #end-card p {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: #ddd;
         }
         .cta-button {
             background-color: #F27A1A;
             color: white;
-            padding: 15px 40px;
-            border-radius: 8px;
-            font-size: 20px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 18px;
             font-weight: bold;
             border: none;
             cursor: pointer;
             text-decoration: none;
-            box-shadow: 0 4px 15px rgba(242, 122, 26, 0.4);
+            box-shadow: 0 4px 15px rgba(242, 122, 26, 0.5);
             transition: transform 0.2s;
+            display: inline-block;
+            margin-bottom: 15px;
+            width: 80%;
         }
-        .cta-button:hover {
-            transform: scale(1.05);
+        .cta-button:active {
+            transform: scale(0.95);
         }
         .retry-button {
-            margin-top: 20px;
             background: transparent;
-            border: 2px solid white;
-            color: white;
-            padding: 10px 30px;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.8);
+            padding: 8px 20px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
         }
         #logo {
             position: absolute;
-            bottom: 20px;
+            bottom: 10px;
             color: #F27A1A;
             font-weight: 900;
-            font-size: 24px;
+            font-size: 18px;
             background: white;
-            padding: 5px 15px;
+            padding: 2px 10px;
             border-radius: 4px;
+        }
+        /* Tap hint animation */
+        .tap-hint {
+            position: absolute;
+            bottom: 100px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            animation: bounce 1s infinite;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <canvas id="gameCanvas"></canvas>
+    <canvas id="gameCanvas" width="320" height="480"></canvas>
+
     <div id="ui-layer">
-        <div id="score-board">Skor: <span id="score">0</span></div>
+        <div id="header">Kategori Seçmek İçin İlerle!</div>
+        <div class="tap-hint" id="tap-hint">Başlamak için Dokun</div>
     </div>
+
     <div id="end-card">
-        <h1 id="end-message">Teslimat Başarılı!</h1>
-        <a href="https://www.trendyol.com" target="_blank" class="cta-button">Trendyol'da Keşfet</a>
-        <button class="retry-button" id="retry-btn">Tekrar Dene</button>
+        <h1 id="end-title">Harika!</h1>
+        <p id="end-desc">Seçtiğin kategoriye gidiliyor...</p>
+        <a href="#" id="cta-link" target="_blank" class="cta-button">Keşfet</a>
+        <button class="retry-button" id="retry-btn">Tekrar Oyna</button>
         <div id="logo">trendyol</div>
     </div>
 </div>
